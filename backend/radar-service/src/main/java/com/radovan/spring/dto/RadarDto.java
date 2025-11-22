@@ -2,6 +2,8 @@ package com.radovan.spring.dto;
 
 import java.io.Serializable;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,17 +30,17 @@ public class RadarDto implements Serializable {
 	@NotNull
 	@Min(30)
 	@Max(300)
-	private Long maxSpeed;
+	private Integer maxSpeed;
 
 	@NotNull
-	@Min(-180)
-	@Max(180)
-	private Long longitude;
+	@DecimalMin(value = "-180")
+	@DecimalMax(value = "180")
+	private Double longitude; // geografska dužina
 
 	@NotNull
-	@Min(-90)
-	@Max(90)
-	private Long latitude;
+	@DecimalMin(value = "-90")
+	@DecimalMax(value = "90")
+	private Double latitude; // geografska širina
 
 	public Long getId() {
 		return id;
@@ -64,27 +66,27 @@ public class RadarDto implements Serializable {
 		this.status = status;
 	}
 
-	public Long getMaxSpeed() {
+	public Integer getMaxSpeed() {
 		return maxSpeed;
 	}
 
-	public void setMaxSpeed(Long maxSpeed) {
+	public void setMaxSpeed(Integer maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
 
-	public Long getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Long longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 
-	public Long getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Long latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 

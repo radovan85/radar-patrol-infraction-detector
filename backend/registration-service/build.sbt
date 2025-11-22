@@ -23,6 +23,10 @@ libraryDependencies ++= Seq(
   "org.mariadb.jdbc" % "mariadb-java-client" % "3.5.5",
   "org.modelmapper" % "modelmapper" % "3.2.5",
   "io.nats" % "jnats" % "2.24.0",
+  "io.jsonwebtoken" % "jjwt-api" % "0.12.7",
+  "io.jsonwebtoken" % "jjwt-impl" % "0.12.7" % "runtime",
+  "io.jsonwebtoken" % "jjwt-jackson" % "0.12.7" % "runtime",
+  "com.github.ben-manes.caffeine" % "caffeine" % "3.2.2",
   "io.micrometer" % "micrometer-registry-prometheus" % "1.14.12"
 
 )

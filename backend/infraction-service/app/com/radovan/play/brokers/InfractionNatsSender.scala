@@ -16,9 +16,9 @@ class InfractionNatsSender @Inject()(
 
   private val REQUEST_TIMEOUT_SECONDS = 5
 
-  def retrieveRadarById(radarId:Long):JsonNode = {
+  def retrieveRadarById(radarId:Long,jwtToken:String):JsonNode = {
     val payload = objectMapper.createObjectNode()
-      //.put("token", jwtToken)
+      .put("token", jwtToken)
       .put("radarId", radarId)
 
     try {

@@ -26,13 +26,13 @@ public class RadarEntity implements Serializable {
 	private Byte status;
 
 	@Column(nullable = false, name = "max_speed")
-	private Long maxSpeed;
+	private Integer maxSpeed;
 
 	@Column(nullable = false)
-	private Long longitude;
+	private Double longitude;
 
 	@Column(nullable = false)
-	private Long latitude;
+	private Double latitude;
 
 	public Long getId() {
 		return id;
@@ -58,27 +58,27 @@ public class RadarEntity implements Serializable {
 		this.status = status;
 	}
 
-	public Long getMaxSpeed() {
+	public Integer getMaxSpeed() {
 		return maxSpeed;
 	}
 
-	public void setMaxSpeed(Long maxSpeed) {
+	public void setMaxSpeed(Integer maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
 
-	public Long getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(Long longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 
-	public Long getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(Long latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 

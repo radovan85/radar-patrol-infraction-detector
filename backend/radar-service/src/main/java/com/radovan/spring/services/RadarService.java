@@ -12,19 +12,19 @@ public interface RadarService {
 
 	RadarDto updateRadar(RadarDto radarDto, Long radarId);
 
-	void deleteRadar(Long radarId);
+	void deleteRadar(Long radarId,String jwtToken);
 
 	List<RadarDto> listAll();
 
 	List<RadarDto> listAllByName(String keyword);
 
-	List<RadarDto> listAllActive();
-
-	void activateRadarPatrol();
+	List<RadarDto> listAllAvailable();
 
 	void deactivateRadarPatrol();
 
-	void activateRadar(Long radarId);
+	void turnOnAvailability(Long radarId);
 
-	void deactivateRadar(Long radarId);
+	void turnOffAvailability(Long radarId);
+
+	void activateRadarPatrol(String jwtToken);
 }

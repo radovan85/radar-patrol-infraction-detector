@@ -25,7 +25,8 @@ class PrometheusController @Inject()(
       urlProvider.getRadarServiceUrl,
       urlProvider.getRegistrationServiceUrl,
       urlProvider.getInfractionServiceUrl,
-      urlProvider.getApiGatewayUrl
+      urlProvider.getApiGatewayUrl,
+      urlProvider.getAuthServiceUrl
     )
 
 

@@ -72,4 +72,18 @@ class InfractionRepositoryImpl extends InfractionRepository{
       session.createQuery(cq).getResultList.asScala.toArray
     }
   }
+
+  override def deleteAllByRadarId(radarId: Long): Unit = {
+    withSession { session =>
+      val cb: CriteriaBuilder = session.getCriteriaBuilder
+      val cq: CriteriaQuery[InfractionEntity] = cb.createQuery(classOf[InfractionEntity])
+      val root: Root[InfractionEntity] = cq.from(classOf[InfractionEntity])
+      val predicate: Predicate = cb.equal(root.get("radarId"), radarId)
+      cq.select(root).where(Array(predicate): _*)
+      val infractions = session.createQuery(cq).getResultList.asScala
+      infractions.foreach(session.remove)
+      session.flush()
+    }
+  }
+
 }

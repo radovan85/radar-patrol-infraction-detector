@@ -9,4 +9,6 @@ trait InfractionRepository {
   def findById(infractionId:Long):Option[InfractionEntity]
 
   def findAll:Array[InfractionEntity]
+
+  def deleteAllByRadarId(radarId:Long):Unit
 }

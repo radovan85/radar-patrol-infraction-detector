@@ -2,6 +2,7 @@ package com.radovan.play.controllers;
 
 import com.radovan.play.dto.OwnerDto;
 import com.radovan.play.exceptions.DataNotValidatedException;
+import com.radovan.play.security.JwtAuthAction;
 import com.radovan.play.services.OwnerService;
 import jakarta.inject.Inject;
 import play.data.Form;
@@ -10,7 +11,9 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.With;
 
+@With(JwtAuthAction.class)
 public class OwnerController extends Controller {
 
     private OwnerService ownerService;

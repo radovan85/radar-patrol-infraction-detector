@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.radovan.spring.dto.RadarDto;
 import com.radovan.spring.exceptions.DataNotValidatedException;
 import com.radovan.spring.services.RadarService;
+import com.radovan.spring.utils.TokenUtils;
 
 @RestController
 @RequestMapping(value = "/api/radars")
@@ -65,20 +66,33 @@ public class RadarController {
 
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<String> deleteRadar(@PathVariable("id") Long radarId) {
-		radarService.deleteRadar(radarId);
+		radarService.deleteRadar(radarId, TokenUtils.provideToken());
 		return new ResponseEntity<>("Radar with id " + radarId + " has been permanently removed!", HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/activatePatrol")
 	public ResponseEntity<String> activatePatrol() {
-		radarService.activateRadarPatrol();
+		radarService.activateRadarPatrol(TokenUtils.provideToken());
 		return new ResponseEntity<>("Radar control has been activated!", HttpStatus.OK);
 	}
-	
-	@GetMapping(value="/deactivatePatrol")
-	public ResponseEntity<String> deactivatePatrol(){
+
+	@GetMapping(value = "/deactivatePatrol")
+	public ResponseEntity<String> deactivatePatrol() {
 		radarService.deactivateRadarPatrol();
 		return new ResponseEntity<>("Radar control has been terminated!", HttpStatus.OK);
+	}
+
+	@PutMapping(value = "/openRadar/{id}")
+	public ResponseEntity<String> activateRadar(@PathVariable("id") Long radarId) {
+		radarService.turnOnAvailability(radarId);
+		return new ResponseEntity<>("Radar with id " + radarId + " is available now!", HttpStatus.OK);
+	}
+
+	@PutMapping(value = "/closeRadar/{id}")
+	public ResponseEntity<String> deactivateRadar(@PathVariable("id") Long radarId) {
+		radarService.turnOffAvailability(radarId);
+		return new ResponseEntity<>("Radar with id " + radarId + " is not available for operations now!",
+				HttpStatus.OK);
 	}
 
 }

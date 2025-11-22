@@ -21,6 +21,7 @@ class ServiceUrlProvider @Inject() (eurekaServiceDiscovery: EurekaServiceDiscove
   def getRegistrationServiceUrl: String = getServiceUrl("registration-service")
   def getInfractionServiceUrl: String = getServiceUrl("infraction-service")
   def getApiGatewayUrl: String = getServiceUrl("api-gateway")
+  def getAuthServiceUrl:String = getServiceUrl("auth-service")
 
   private def validateUrl(url: String, serviceName: String): Unit = {
     if (url == null || !url.startsWith("http")) {

@@ -7,9 +7,10 @@ import com.radovan.play.repository.InfractionRepository
 import com.radovan.play.repository.impl.InfractionRepositoryImpl
 import com.radovan.play.services.{EurekaRegistrationService, EurekaServiceDiscovery, InfractionService, PrometheusService}
 import com.radovan.play.services.impl.{EurekaRegistrationServiceImpl, EurekaServiceDiscoveryImpl, InfractionServiceImpl, PrometheusServiceImpl}
-import com.radovan.play.utils.{ServiceUrlProvider, TimeConversionUtils}
+import com.radovan.play.utils.{JwtUtil, PublicKeyCache, ServiceUrlProvider, TimeConversionUtils}
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.prometheusmetrics.{PrometheusConfig, PrometheusMeterRegistry}
+import io.nats.client.support.JwtUtils
 
 class AutoBindModule extends AbstractModule{
 
@@ -21,6 +22,8 @@ class AutoBindModule extends AbstractModule{
 
     bind(classOf[InfractionRepository]).to(classOf[InfractionRepositoryImpl]).asEagerSingleton()
 
+    bind(classOf[JwtUtil]).asEagerSingleton()
+    bind(classOf[PublicKeyCache]).asEagerSingleton()
     bind(classOf[InfractionNatsSender]).asEagerSingleton()
     bind(classOf[InfractionNatsListener]).asEagerSingleton()
     bind(classOf[TimeConversionUtils]).asEagerSingleton()

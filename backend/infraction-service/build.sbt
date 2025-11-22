@@ -29,6 +29,10 @@ libraryDependencies ++= Seq(
   "org.modelmapper" % "modelmapper" % "3.2.5",
   "io.nats" % "jnats" % "2.24.0",
   "org.apache.httpcomponents.client5" % "httpclient5" % "5.5.1",
+  "io.jsonwebtoken" % "jjwt-api" % "0.12.7",
+  "io.jsonwebtoken" % "jjwt-impl" % "0.12.7" % "runtime",
+  "io.jsonwebtoken" % "jjwt-jackson" % "0.12.7" % "runtime",
+  "com.github.ben-manes.caffeine" % "caffeine" % "3.2.2",
   "io.micrometer" % "micrometer-registry-prometheus" % "1.14.12"
   )
 

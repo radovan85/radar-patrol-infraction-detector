@@ -1,8 +1,10 @@
 package com.radovan.play.brokers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.radovan.play.services.VehicleService;
+import com.radovan.play.utils.JwtUtil;
 import com.radovan.play.utils.NatsUtils;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
@@ -10,6 +12,8 @@ import io.nats.client.MessageHandler;
 import io.nats.client.impl.Headers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.nio.charset.StandardCharsets;
 
 @Singleton
 public class NatsBrokerListener {
@@ -19,12 +23,14 @@ public class NatsBrokerListener {
     private VehicleService vehicleService;
     private static final String ContentTypeHeader = "Content-Type";
     private static final String ApplicationJson = "application/json";
+    private JwtUtil jwtUtil;
 
     @Inject
-    private void initialize(NatsUtils natsUtils, ObjectMapper objectMapper, VehicleService vehicleService) {
+    private void initialize(NatsUtils natsUtils, ObjectMapper objectMapper, VehicleService vehicleService,JwtUtil jwtUtil) {
         this.natsUtils = natsUtils;
         this.objectMapper = objectMapper;
         this.vehicleService = vehicleService;
+        this.jwtUtil = jwtUtil;
         initListeners();
     }
 
@@ -41,27 +47,49 @@ public class NatsBrokerListener {
 
     private MessageHandler getAllVehicles = msg -> {
         try {
-            // Uzimamo sve vozila iz servisa
+            String payloadStr = new String(msg.getData(), StandardCharsets.UTF_8);
+
+            // Parsiraj JSON u JsonNode
+            JsonNode root = objectMapper.readTree(payloadStr);
+
+            // Izvuci jwtToken iz poruke
+            String jwtToken = root.has("jwtToken") ? root.get("jwtToken").asText() : "";
+
+            // ✅ Validiraj token preko JwtUtil
+            boolean valid = jwtUtil.validateToken(jwtToken).join();
+            if (!valid) {
+                sendErrorResponse(msg.getReplyTo(), "Unauthorized: invalid token", 401);
+                return;
+            }
+
+            // Ako je token validan, možeš izvući i userId/roles ako ti trebaju
+            //Optional<String> userIdOpt = jwtUtil.extractUsername(jwtToken).join();
+            //Optional<List<String>> rolesOpt = jwtUtil.extractRoles(jwtToken).join();
+
+            // Uzimamo vozila iz servisa
             var vehicles = vehicleService.listAll();
 
             // Konvertujemo u JSON
-            byte[] payload = objectMapper.writeValueAsBytes(vehicles);
+            byte[] responsePayload = objectMapper.writeValueAsBytes(vehicles);
 
-            // Dodajemo header da je JSON
             Headers headers = new Headers();
             headers.add(ContentTypeHeader, ApplicationJson);
 
-            // Ako postoji replyTo, šaljemo nazad
             if (msg.getReplyTo() != null) {
-                natsUtils.getConnection().publish(msg.getReplyTo(), headers, payload);
+                natsUtils.getConnection().publish(msg.getReplyTo(), headers, responsePayload);
             } else {
                 System.out.println("No reply subject provided for vehicles.getAll");
             }
+
+            //System.out.printf("✅ Vehicles fetched successfully for user %s%n", userIdOpt.orElse("unknown"));
+
         } catch (Exception e) {
-            // Ako nešto pukne, šaljemo error response
+            e.printStackTrace();
             sendErrorResponse(msg.getReplyTo(), "Failed to fetch vehicles: " + e.getMessage(), 500);
         }
     };
+
+
 
 
     private int extractIdFromSubject(String subject, String prefix) {

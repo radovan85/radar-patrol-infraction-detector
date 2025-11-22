@@ -28,144 +28,163 @@ import tools.jackson.databind.node.ObjectNode;
 @Service
 public class RadarServiceImpl implements RadarService {
 
-    private RadarRepository radarRepository;
-    private TempConverter tempConverter;
-    private RadarNatsSender natsSender;
-    private ObjectMapper objectMapper;
+	private RadarRepository radarRepository;
+	private TempConverter tempConverter;
+	private RadarNatsSender natsSender;
+	private ObjectMapper objectMapper;
 
-    private final ScheduledExecutorService patrolScheduler = Executors.newScheduledThreadPool(1);
-    private ScheduledFuture<?> patrolFuture; // referenca na aktivnu patrolu
-    private final Map<Long, Long> vehicleCooldown = new ConcurrentHashMap<>();
-    private final Random random = new Random();
+	private final ScheduledExecutorService patrolScheduler = Executors.newScheduledThreadPool(1);
+	private ScheduledFuture<?> patrolFuture; // referenca na aktivnu patrolu
+	private final Map<Long, Long> vehicleCooldown = new ConcurrentHashMap<>();
+	private final Random random = new Random();
 
-    @Autowired
-    private void initialize(RadarRepository radarRepository, TempConverter tempConverter,
-                            RadarNatsSender natsSender, ObjectMapper objectMapper) {
-        this.radarRepository = radarRepository;
-        this.tempConverter = tempConverter;
-        this.natsSender = natsSender;
-        this.objectMapper = objectMapper;
-    }
+	@Autowired
+	private void initialize(RadarRepository radarRepository, TempConverter tempConverter, RadarNatsSender natsSender,
+			ObjectMapper objectMapper) {
+		this.radarRepository = radarRepository;
+		this.tempConverter = tempConverter;
+		this.natsSender = natsSender;
+		this.objectMapper = objectMapper;
+	}
 
-    @Override
-    public RadarDto addRadar(RadarDto radarDto) {
-        RadarEntity storedRadar = radarRepository.save(tempConverter.dtoToEntity(radarDto));
-        return tempConverter.entityToDto(storedRadar);
-    }
+	@Override
+	public RadarDto addRadar(RadarDto radarDto) {
+		RadarEntity storedRadar = radarRepository.save(tempConverter.dtoToEntity(radarDto));
+		return tempConverter.entityToDto(storedRadar);
+	}
 
-    @Override
-    public RadarDto getRadarById(Long radarId) {
-        RadarEntity radarEntity = radarRepository.findById(radarId)
-                .orElseThrow(() -> new InstanceUndefinedException("The radar has not been found!"));
-        return tempConverter.entityToDto(radarEntity);
-    }
+	@Override
+	public RadarDto getRadarById(Long radarId) {
+		RadarEntity radarEntity = radarRepository.findById(radarId)
+				.orElseThrow(() -> new InstanceUndefinedException("The radar has not been found!"));
+		return tempConverter.entityToDto(radarEntity);
+	}
 
-    @Override
-    public RadarDto updateRadar(RadarDto radarDto, Long radarId) {
-        getRadarById(radarId);
-        radarDto.setId(radarId);
-        RadarEntity updatedRadar = radarRepository.save(tempConverter.dtoToEntity(radarDto));
-        return tempConverter.entityToDto(updatedRadar);
-    }
+	@Override
+	public RadarDto updateRadar(RadarDto radarDto, Long radarId) {
+		getRadarById(radarId);
+		radarDto.setId(radarId);
+		RadarEntity updatedRadar = radarRepository.save(tempConverter.dtoToEntity(radarDto));
+		return tempConverter.entityToDto(updatedRadar);
+	}
 
-    @Override
-    public void deleteRadar(Long radarId) {
-        getRadarById(radarId);
-        radarRepository.deleteById(radarId);
-    }
+	@Override
+	public void deleteRadar(Long radarId, String jwtToken) {
+		getRadarById(radarId);
+		natsSender.deleteInfractionsByRadarId(radarId, jwtToken);
+		radarRepository.deleteById(radarId);
+	}
 
-    @Override
-    public List<RadarDto> listAll() {
-        return radarRepository.findAll().stream().map(tempConverter::entityToDto).collect(Collectors.toList());
-    }
+	@Override
+	public List<RadarDto> listAll() {
+		return radarRepository.findAll().stream().map(tempConverter::entityToDto).collect(Collectors.toList());
+	}
 
-    @Override
-    public List<RadarDto> listAllByName(String keyword) {
-        return radarRepository.findAllByName(keyword).stream().map(tempConverter::entityToDto)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<RadarDto> listAllByName(String keyword) {
+		return radarRepository.findAllByName(keyword).stream().map(tempConverter::entityToDto)
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public List<RadarDto> listAllActive() {
-        return radarRepository.findAll().stream().map(tempConverter::entityToDto).collect(Collectors.toList());
-    }
+	@Override
+	public List<RadarDto> listAllAvailable() {
+		return radarRepository.findAllActive().stream().map(tempConverter::entityToDto).collect(Collectors.toList());
+	}
 
-    @Override
-    public void activateRadarPatrol() {
-        List<RadarDto> allRadars = listAllActive();
-        JsonNode[] allVehicles = natsSender.retrieveAllVehicles();
+	@Override
+	public void activateRadarPatrol(String jwtToken) {
+		if (patrolFuture != null && !patrolFuture.isCancelled() && !patrolFuture.isDone()) {
+			throw new InstanceUndefinedException("Radar patrol is already active");
+		}
 
-        // Sačuvaj referencu na zakazani task
-        patrolFuture = patrolScheduler.scheduleAtFixedRate(() -> {
-            try {
-                JsonNode vehicleNode = allVehicles[random.nextInt(allVehicles.length)];
-                long vehicleId = vehicleNode.get("id").longValue();
+		List<RadarDto> allRadars = listAllAvailable();
+		JsonNode[] allVehicles = natsSender.retrieveAllVehicles(jwtToken);
 
-                long now = System.currentTimeMillis();
-                long lastSeen = vehicleCooldown.getOrDefault(vehicleId, 0L);
-                if (now - lastSeen < (3 * 60 * 1000)) {
-                    System.out.println("⏳ Vehicle " + vehicleNode.get("registrationNumber").stringValue() + " is on cooldown.");
-                    return;
-                }
+		if (allVehicles == null || allVehicles.length < 1) {
+			throw new InstanceUndefinedException("At least 1 vehicle required for operation");
+		}
+		if (allRadars == null || allRadars.isEmpty()) {
+			throw new InstanceUndefinedException("At least 1 active radar required for operation");
+		}
 
-                RadarDto radar = allRadars.get(random.nextInt(allRadars.size()));
-                long maxSpeed = radar.getMaxSpeed();
+		patrolFuture = patrolScheduler.scheduleAtFixedRate(() -> {
+			try {
+				JsonNode vehicleNode = allVehicles[random.nextInt(allVehicles.length)];
+				long vehicleId = vehicleNode.get("id").longValue();
 
-                int speed;
-                if (random.nextDouble() < 0.9) {
-                    long minSpeed = Math.max(30, maxSpeed - 20);
-                    long range = maxSpeed - minSpeed + 1;
-                    speed = (int) (minSpeed + random.nextInt((int) range));
-                } else {
-                    int range = 40;
-                    speed = (int) (maxSpeed + 1 + random.nextInt(range));
-                }
+				long now = System.currentTimeMillis();
+				long lastSeen = vehicleCooldown.getOrDefault(vehicleId, 0L);
+				if (now - lastSeen < (3 * 60 * 1000)) {
+					System.out.println(
+							"⏳ Vehicle " + vehicleNode.get("registrationNumber").stringValue() + " is on cooldown.");
+					return;
+				}
 
-                System.out.printf("📸 Radar %s captured vehicle %s (%s) at %d km/h\n",
-                        radar.getName(),
-                        vehicleNode.get("registrationNumber").stringValue(),
-                        vehicleNode.get("brand").stringValue(),
-                        speed);
+				RadarDto radar = (allRadars.size() == 1) ? allRadars.get(0)
+						: allRadars.get(random.nextInt(allRadars.size()));
 
-                if (speed > maxSpeed) {
-                    System.out.printf("⚡ Infraction committed! Vehicle %s exceeded speed limit (limit=%d, speed=%d km/h)\n",
-                            vehicleNode.get("registrationNumber").stringValue(), maxSpeed, speed);
+				int maxSpeed = radar.getMaxSpeed();
 
-                    ObjectNode infractionJson = objectMapper.createObjectNode();
-                    infractionJson.put("vehicleRegistrationNumber", vehicleNode.get("registrationNumber").stringValue());
-                    infractionJson.put("vehicleSpeed", speed);
-                    infractionJson.put("radarId", radar.getId());
+				int speed;
+				if (random.nextDouble() < 0.9) {
+					int minSpeed = Math.max(30, maxSpeed - 20);
+					int range = maxSpeed - minSpeed + 1;
+					speed = minSpeed + random.nextInt(range);
+				} else {
+					int range = 40;
+					speed = maxSpeed + 1 + random.nextInt(range);
+				}
 
-                    natsSender.sendInfraction(infractionJson);
-                }
+				System.out.printf("📸 Radar %s captured vehicle %s (%s) at %d km/h\n", radar.getName(),
+						vehicleNode.get("registrationNumber").stringValue(), vehicleNode.get("brand").stringValue(),
+						speed);
 
-                vehicleCooldown.put(vehicleId, now);
+				if (speed > maxSpeed) {
+					System.out.printf(
+							"⚡ Infraction committed! Vehicle %s exceeded speed limit (limit=%d, speed=%d km/h)\n",
+							vehicleNode.get("registrationNumber").stringValue(), maxSpeed, speed);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 0, 5, TimeUnit.SECONDS);
-    }
+					ObjectNode infractionJson = objectMapper.createObjectNode();
+					infractionJson.put("vehicleRegistrationNumber",
+							vehicleNode.get("registrationNumber").stringValue());
+					infractionJson.put("vehicleSpeed", speed);
+					infractionJson.put("radarId", radar.getId());
 
-    @Override
-    public void deactivateRadarPatrol() {
-        if (patrolFuture != null && !patrolFuture.isCancelled()) {
-            patrolFuture.cancel(true); // prekida task
-            System.out.println("🛑 Radar patrol deactivated.");
-        }
-    }
+					natsSender.sendInfraction(infractionJson, jwtToken);
+				}
 
-    @Override
-    public void activateRadar(Long radarId) {
-        RadarDto radar = getRadarById(radarId);
-        radar.setStatus((short) 1);
-        addRadar(radar);
-    }
+				vehicleCooldown.put(vehicleId, now);
 
-    @Override
-    public void deactivateRadar(Long radarId) {
-        RadarDto radar = getRadarById(radarId);
-        radar.setStatus((short) 0);
-        addRadar(radar);
-    }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, 0, 5, TimeUnit.SECONDS);
+
+		System.out.println("🚀 Radar patrol activated.");
+	}
+
+	@Override
+	public void deactivateRadarPatrol() {
+		if (patrolFuture != null && !patrolFuture.isCancelled()) {
+			patrolFuture.cancel(true);
+			patrolFuture = null; // reset
+			System.out.println("🛑 Radar patrol deactivated.");
+		} else {
+			throw new InstanceUndefinedException("Radar patrol is not active");
+		}
+	}
+
+	@Override
+	public void turnOnAvailability(Long radarId) {
+		RadarDto radar = getRadarById(radarId);
+		radar.setStatus((short) 1);
+		addRadar(radar);
+	}
+
+	@Override
+	public void turnOffAvailability(Long radarId) {
+		RadarDto radar = getRadarById(radarId);
+		radar.setStatus((short) 0);
+		addRadar(radar);
+	}
 }

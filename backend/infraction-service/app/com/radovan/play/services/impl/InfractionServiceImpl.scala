@@ -26,9 +26,9 @@ class InfractionServiceImpl extends InfractionService{
     this.natsSender = natsSender
   }
 
-  override def addInfraction(infractionDto: InfractionDto): InfractionDto = {
+  override def addInfraction(infractionDto: InfractionDto,jwtToken:String): InfractionDto = {
     // 1. Preuzmi radar payload preko NATS-a
-    val radarPayload = natsSender.retrieveRadarById(infractionDto.getRadarId())
+    val radarPayload = natsSender.retrieveRadarById(infractionDto.getRadarId(),jwtToken)
 
     // 2. Izvuci maxSpeed iz payload-a
     val maxSpeed: Long = radarPayload.get("maxSpeed").asLong()
@@ -79,4 +79,7 @@ class InfractionServiceImpl extends InfractionService{
     }
   }
 
+  override def deleteAllByRadarId(radarId: Long,jwtToken:String): Unit = {
+    infractionRepository.deleteAllByRadarId(radarId)
+  }
 }

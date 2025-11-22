@@ -30,7 +30,6 @@ class ServiceUrlProvider @Inject()(
   }
 
   def getAuthServiceUrl: String = getServiceUrl("auth-service")
-  def getCustomerServiceUrl: String = getServiceUrl("customer-service")
 
   private def validateUrl(url: String, serviceName: String): Unit = {
     if (url == null || !url.startsWith("http"))

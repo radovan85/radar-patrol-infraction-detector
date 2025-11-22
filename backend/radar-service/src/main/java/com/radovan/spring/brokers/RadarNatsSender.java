@@ -31,8 +31,9 @@ public class RadarNatsSender {
 		this.natsUtils = natsUtils;
 	}
 
-	public JsonNode[] retrieveAllVehicles() {
+	public JsonNode[] retrieveAllVehicles(String jwtToken) {
 		ObjectNode payload = objectMapper.createObjectNode();
+		payload.put("jwtToken", jwtToken);
 		String response = sendRequest("vehicles.getAll", payload.toString());
 		JsonNode jsonNode;
 		try {
@@ -57,57 +58,86 @@ public class RadarNatsSender {
 
 		return StreamSupport.stream(vehiclesNode.spliterator(), false).toArray(JsonNode[]::new);
 	}
-	
-	public void sendInfraction(JsonNode infractionJson) {
-	    try {
-	        String payload = objectMapper.writeValueAsString(infractionJson);
 
-	        Connection connection = natsUtils.getConnection();
-	        if (connection == null) {
-	            throw new RuntimeException("NATS connection is not initialized");
-	        }
+	public void sendInfraction(JsonNode infractionJson, String jwtToken) {
+		try {
+			// Napravi wrapper JSON objekat
+			ObjectNode wrapper = objectMapper.createObjectNode();
+			wrapper.put("jwtToken", jwtToken);
+			wrapper.set("infraction", infractionJson);
 
-	        connection.publish("infraction.create", payload.getBytes(StandardCharsets.UTF_8));
+			String payload = objectMapper.writeValueAsString(wrapper);
 
-	        System.out.printf("📤 Infraction sent: %s%n", payload);
+			Connection connection = natsUtils.getConnection();
+			if (connection == null) {
+				throw new RuntimeException("NATS connection is not initialized");
+			}
 
-	    } catch (Exception e) {
-	        throw new RuntimeException("Failed to send infraction", e);
-	    }
+			connection.publish("infraction.create", payload.getBytes(StandardCharsets.UTF_8));
+
+			System.out.printf("📤 Infraction sent: %s%n", payload);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to send infraction", e);
+		}
 	}
 
+	public void deleteInfractionsByRadarId(Long radarId, String jwtToken) {
+		try {
+			// Napravi payload sa tokenom
+			ObjectNode payload = objectMapper.createObjectNode();
+			payload.put("jwtToken", jwtToken);
 
+			String payloadStr = objectMapper.writeValueAsString(payload);
+
+			Connection connection = natsUtils.getConnection();
+			if (connection == null) {
+				throw new RuntimeException("NATS connection is not initialized");
+			}
+
+			// Subject je dinamičan: infractions.deleteByRadarId.{radarId}
+			String subject = "infractions.deleteByRadarId." + radarId;
+
+			// Pošalji request i čekaj odgovor
+			String response = sendRequest(subject, payloadStr);
+
+			System.out.printf("🗑️ Delete infractions response for radar %d: %s%n", radarId, response);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to delete infractions for radarId " + radarId, e);
+		}
+	}
 
 	private String sendRequest(String subject, String payload) {
-	    Connection connection = natsUtils.getConnection();
-	    if (connection == null) {
-	        throw new RuntimeException("NATS connection is not initialized");
-	    }
+		Connection connection = natsUtils.getConnection();
+		if (connection == null) {
+			throw new RuntimeException("NATS connection is not initialized");
+		}
 
-	    try {
-	        CompletableFuture<Message> future = connection.request(subject, payload.getBytes(StandardCharsets.UTF_8));
+		try {
+			CompletableFuture<Message> future = connection.request(subject, payload.getBytes(StandardCharsets.UTF_8));
 
-	        Message msg = future.get(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			Message msg = future.get(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-	        // 👇 Ovde čitaš body kao string
-	        String body = new String(msg.getData(), StandardCharsets.UTF_8);
+			// 👇 Ovde čitaš body kao string
+			String body = new String(msg.getData(), StandardCharsets.UTF_8);
 
-	        // 👇 Ako želiš da vidiš headers
-	        if (msg.hasHeaders()) {
-	            msg.getHeaders().forEach((key, values) -> {
-	                System.out.println("Header: " + key + " = " + values);
-	            });
-	        }
+			// 👇 Ako želiš da vidiš headers
+			if (msg.hasHeaders()) {
+				msg.getHeaders().forEach((key, values) -> {
+					System.out.println("Header: " + key + " = " + values);
+				});
+			}
 
-	        return body;
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("NATS request timeout for subject: " + subject, e);
-	    } catch (InterruptedException e) {
-	        Thread.currentThread().interrupt();
-	        throw new RuntimeException("NATS request interrupted for subject: " + subject, e);
-	    } catch (Exception e) {
-	        throw new RuntimeException("NATS request failed for subject: " + subject, e);
-	    }
+			return body;
+		} catch (TimeoutException e) {
+			throw new RuntimeException("NATS request timeout for subject: " + subject, e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException("NATS request interrupted for subject: " + subject, e);
+		} catch (Exception e) {
+			throw new RuntimeException("NATS request failed for subject: " + subject, e);
+		}
 	}
 
 }

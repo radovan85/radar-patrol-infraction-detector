@@ -9,7 +9,10 @@ import com.radovan.play.repositories.impl.OwnerRepositoryImpl;
 import com.radovan.play.repositories.impl.VehicleRepositoryImpl;
 import com.radovan.play.services.*;
 import com.radovan.play.services.impl.*;
+import com.radovan.play.utils.JwtUtil;
 import com.radovan.play.utils.LoadData;
+import com.radovan.play.utils.PublicKeyCache;
+import com.radovan.play.utils.ServiceUrlProvider;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
@@ -29,6 +32,9 @@ public class AutoBindModule extends AbstractModule {
         bind(VehicleRepository.class).to(VehicleRepositoryImpl.class).asEagerSingleton();
 
 
+        bind(JwtUtil.class).asEagerSingleton();
+        bind(PublicKeyCache.class).asEagerSingleton();
+        bind(ServiceUrlProvider.class).asEagerSingleton();
         bind(LoadData.class).asEagerSingleton();
         bind(TempConverter.class).asEagerSingleton();
         bind(NatsBrokerListener.class).asEagerSingleton();

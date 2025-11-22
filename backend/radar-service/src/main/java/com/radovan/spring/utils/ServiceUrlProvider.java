@@ -42,8 +42,4 @@ public class ServiceUrlProvider {
 		}
 	}
 
-	public String getCustomerServiceUrl() {
-		return getServiceUrl("customer-service");
-	}
-
 }

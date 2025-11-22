@@ -74,7 +74,8 @@ class ApiGatewayController(
       "radars" -> "radar-service",
       "owners" -> "registration-service",
       "vehicles" -> "registration-service",
-      "infractions" -> "infraction-service"
+      "infractions" -> "infraction-service",
+      "auth" -> "auth-service"
 
     )
     serviceMappings.get(segment)

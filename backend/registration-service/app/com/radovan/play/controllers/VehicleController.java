@@ -4,6 +4,7 @@ import com.radovan.play.dto.VehicleDto;
 import com.radovan.play.exceptions.DataNotValidatedException;
 import com.radovan.play.security.JwtAuthAction;
 import com.radovan.play.services.VehicleService;
+import com.radovan.play.utils.TokenUtils;
 import jakarta.inject.Inject;
 import play.data.Form;
 import play.data.FormFactory;
@@ -61,9 +62,17 @@ public class VehicleController extends Controller {
         return ok(Json.toJson("Vehicle with id " + updatedVehicle.getId() + " has been updated!"));
     }
 
-    public Result deleteVehicle(Long vehicleId){
-        vehicleService.deleteVehicle(vehicleId);
+    public Result deleteVehicle(Long vehicleId, Http.Request request){
+        vehicleService.deleteVehicle(vehicleId, TokenUtils.provideToken(request));
         return ok(Json.toJson("Vehicle with id " + vehicleId + " has been permanently removed!"));
+    }
+
+    public Result countVehicles(){
+        return ok(Json.toJson(vehicleService.vehicleCount()));
+    }
+
+    public Result getAllByOwnerId(Long ownerId){
+        return ok(Json.toJson(vehicleService.listAllByOwnerId(ownerId)));
     }
 
 

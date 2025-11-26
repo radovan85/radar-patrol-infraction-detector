@@ -122,5 +122,20 @@ public class RadarRepositoryImpl implements RadarRepository {
 	    });
 	}
 
+	@Override
+	public Long count() {
+	    return withSession(session -> {
+	        CriteriaBuilder cb = session.getCriteriaBuilder();
+	        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+	        Root<RadarEntity> root = query.from(RadarEntity.class);
+
+	        // SELECT COUNT(root)
+	        query.select(cb.count(root));
+
+	        return session.createQuery(query).getSingleResult();
+	    });
+	}
+
+
 
 }

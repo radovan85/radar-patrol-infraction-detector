@@ -4,7 +4,7 @@ import com.radovan.play.entity.InfractionEntity
 import com.radovan.play.repository.InfractionRepository
 import com.radovan.play.services.PrometheusService
 import jakarta.inject.{Inject, Singleton}
-import jakarta.persistence.criteria.{CriteriaBuilder, CriteriaQuery, Predicate, Root}
+import jakarta.persistence.criteria.{CriteriaBuilder, CriteriaQuery, Predicate, Root, Selection}
 import org.hibernate.{Session, SessionFactory}
 
 import scala.jdk.CollectionConverters._
@@ -86,4 +86,30 @@ class InfractionRepositoryImpl extends InfractionRepository{
     }
   }
 
+  override def count: Long = {
+    withSession { session =>
+      val cb: CriteriaBuilder = session.getCriteriaBuilder
+      val cq: CriteriaQuery[java.lang.Long] = cb.createQuery(classOf[java.lang.Long])
+      val root: Root[InfractionEntity] = cq.from(classOf[InfractionEntity])
+
+      // SELECT COUNT(*)
+      cq.select(cb.count(root).asInstanceOf[Selection[java.lang.Long]])
+
+      session.createQuery(cq).getSingleResult
+    }
+  }
+
+
+  override def deleteAllByRegNumber(regNumber: String): Unit = {
+    withSession { session =>
+      val cb: CriteriaBuilder = session.getCriteriaBuilder
+      val cq: CriteriaQuery[InfractionEntity] = cb.createQuery(classOf[InfractionEntity])
+      val root: Root[InfractionEntity] = cq.from(classOf[InfractionEntity])
+      val predicate: Predicate = cb.equal(root.get("vehicleRegistrationNumber"), regNumber)
+      cq.select(root).where(Array(predicate): _*)
+      val infractions = session.createQuery(cq).getResultList.asScala
+      infractions.foreach(session.remove)
+      session.flush()
+    }
+  }
 }

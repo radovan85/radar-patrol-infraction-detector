@@ -31,7 +31,7 @@ class InfractionServiceImpl extends InfractionService{
     val radarPayload = natsSender.retrieveRadarById(infractionDto.getRadarId(),jwtToken)
 
     // 2. Izvuci maxSpeed iz payload-a
-    val maxSpeed: Long = radarPayload.get("maxSpeed").asLong()
+    val maxSpeed = radarPayload.get("maxSpeed").asInt()
 
     // 3. Izračunaj amount na osnovu brzine vozila i maxSpeed-a
     val infractionAmount: Long = calculateInfractionAmount(
@@ -64,7 +64,7 @@ class InfractionServiceImpl extends InfractionService{
     }
   }
 
-  private def calculateInfractionAmount(speed: Long, maxSpeed: Long): Long = {
+  private def calculateInfractionAmount(speed: Int, maxSpeed: Int): Long = {
     val excess = speed - maxSpeed
     if (excess <= 0) {
       0L // nema prekršaja
@@ -81,5 +81,11 @@ class InfractionServiceImpl extends InfractionService{
 
   override def deleteAllByRadarId(radarId: Long,jwtToken:String): Unit = {
     infractionRepository.deleteAllByRadarId(radarId)
+  }
+
+  override def countInfractions: Long = infractionRepository.count
+
+  override def deleteAllByRegNumber(regNumber: String, jwtToken: String): Unit = {
+    infractionRepository.deleteAllByRegNumber(regNumber)
   }
 }

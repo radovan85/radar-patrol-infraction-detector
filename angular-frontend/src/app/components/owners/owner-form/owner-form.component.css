@@ -1,0 +1,8 @@
+.form-error {
+    display: none;
+}
+
+.form-error.is-visible {
+    display: block;
+    color: red;
+}

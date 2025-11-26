@@ -20,4 +20,6 @@ public interface VehicleRepository {
     Optional<VehicleEntity> findByRegistrationNumber(String registrationNumber);
 
     List<VehicleEntity> findByRegistrationNumberContaining(String keyword);
+
+    List<VehicleEntity> findAllByOwnerId(Long ownerId);
 }

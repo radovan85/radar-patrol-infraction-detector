@@ -21,7 +21,7 @@ class InfractionEntity extends Serializable{
   @BeanProperty var vehicleRegistrationNumber:String = _
 
   @Column(name="vehicle_speed",nullable = false)
-  @BeanProperty var vehicleSpeed:java.lang.Long = _
+  @BeanProperty var vehicleSpeed:java.lang.Integer = _
 
   @Column(name="radar_id",nullable = false)
   @BeanProperty var radarId:java.lang.Long = _

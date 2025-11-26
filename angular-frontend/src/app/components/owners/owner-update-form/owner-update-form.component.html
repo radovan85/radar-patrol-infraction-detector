@@ -1,0 +1,40 @@
+<div class="grid-x grid-padding-x">
+    <div class="cell small-12 medium-8 large-6">
+        <div class="card">
+            <div class="card-divider">
+                <h5>Update Owner</h5>
+            </div>
+            <div class="card-section">
+                <form id="ownerForm">
+                    <!-- Name -->
+                    <label for="name">Name
+                        <input type="text" id="name" name="name" placeholder="Enter name"
+                            [value]="getCurrentOwner().name">
+                    </label>
+                    <span class="form-error" id="nameError"></span>
+
+                    <!-- Birth Date -->
+                    <label for="birthDateStr">Birth Date
+                        <input type="date" id="birthDateStr" name="birthDateStr"
+                            [value]="formatDateForInput(getCurrentOwner().birthDateStr)">
+                    </label>
+                    <span class="form-error" id="birthDateError"></span>
+
+
+
+                    <!-- Email -->
+                    <label for="email">Email
+                        <input type="email" id="email" name="email" placeholder="Enter email"
+                            [value]="getCurrentOwner().email">
+                    </label>
+                    <span class="form-error" id="emailError"></span>
+
+                    <!-- Submit -->
+                    <button type="submit" class="button success expanded">
+                        ➕ Update Owner
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

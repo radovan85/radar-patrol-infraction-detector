@@ -2,6 +2,7 @@ package com.radovan.play.modules;
 
 import com.google.inject.AbstractModule;
 import com.radovan.play.brokers.NatsBrokerListener;
+import com.radovan.play.brokers.NatsBrokerSender;
 import com.radovan.play.converter.TempConverter;
 import com.radovan.play.repositories.OwnerRepository;
 import com.radovan.play.repositories.VehicleRepository;
@@ -37,6 +38,7 @@ public class AutoBindModule extends AbstractModule {
         bind(ServiceUrlProvider.class).asEagerSingleton();
         bind(LoadData.class).asEagerSingleton();
         bind(TempConverter.class).asEagerSingleton();
+        bind(NatsBrokerSender.class).asEagerSingleton();
         bind(NatsBrokerListener.class).asEagerSingleton();
         PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
         bind(PrometheusMeterRegistry.class).toInstance(prometheusRegistry);

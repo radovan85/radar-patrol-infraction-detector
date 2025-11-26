@@ -4,6 +4,7 @@ import com.radovan.play.dto.OwnerDto;
 import com.radovan.play.exceptions.DataNotValidatedException;
 import com.radovan.play.security.JwtAuthAction;
 import com.radovan.play.services.OwnerService;
+import com.radovan.play.utils.TokenUtils;
 import jakarta.inject.Inject;
 import play.data.Form;
 import play.data.FormFactory;
@@ -57,8 +58,8 @@ public class OwnerController extends Controller {
         return ok(Json.toJson(ownerService.count()));
     }
 
-    public Result deleteOwner(Long ownerId){
-        ownerService.deleteOwner(ownerId);
+    public Result deleteOwner(Long ownerId, Http.Request request){
+        ownerService.deleteOwner(ownerId, TokenUtils.provideToken(request));
         return ok(Json.toJson("Owner with id " + ownerId + " has been permanently removed!"));
     }
 }

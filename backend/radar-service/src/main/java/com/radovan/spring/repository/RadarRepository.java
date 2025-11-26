@@ -18,5 +18,7 @@ public interface RadarRepository {
 	List<RadarEntity> findAll();
 	
 	List<RadarEntity> findAllActive();
+	
+	Long count();
 
 }

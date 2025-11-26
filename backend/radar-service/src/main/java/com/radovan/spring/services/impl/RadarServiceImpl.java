@@ -187,4 +187,15 @@ public class RadarServiceImpl implements RadarService {
 		radar.setStatus((short) 0);
 		addRadar(radar);
 	}
+
+	@Override
+	public Long countRadars() {
+		return radarRepository.count();
+	}
+
+	@Override
+	public Boolean isPatrolActive() {
+		return patrolFuture != null && !patrolFuture.isCancelled() && !patrolFuture.isDone();
+	}
+
 }

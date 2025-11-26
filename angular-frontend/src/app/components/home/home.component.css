@@ -1,0 +1,10 @@
+.card.hoverable {
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  
+  .card.hoverable:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  

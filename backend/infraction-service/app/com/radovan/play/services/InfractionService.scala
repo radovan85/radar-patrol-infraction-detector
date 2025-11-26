@@ -11,4 +11,8 @@ trait InfractionService {
   def listAll:Array[InfractionDto]
 
   def deleteAllByRadarId(radarId:Long,jwtToken:String):Unit
+
+  def deleteAllByRegNumber(regNumber:String,jwtToken:String)
+
+  def countInfractions:Long
 }

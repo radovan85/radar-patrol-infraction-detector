@@ -20,4 +20,8 @@ class InfractionController @Inject()(
   def getInfractionDetails(infractionId: Long): Action[AnyContent] = secured { req =>
     new ResponsePackage(infractionService.getInfractionById(infractionId), HttpStatus.SC_OK).toResult
   }
+
+  def getInfractionsCount: Action[AnyContent] = secured { req =>
+    new ResponsePackage(infractionService.countInfractions, HttpStatus.SC_OK).toResult
+  }
 }

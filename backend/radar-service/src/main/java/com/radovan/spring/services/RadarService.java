@@ -27,4 +27,9 @@ public interface RadarService {
 	void turnOffAvailability(Long radarId);
 
 	void activateRadarPatrol(String jwtToken);
+	
+	Long countRadars();
+	
+	Boolean isPatrolActive();
+
 }

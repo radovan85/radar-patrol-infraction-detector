@@ -95,4 +95,14 @@ public class RadarController {
 				HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/count")
+	public ResponseEntity<Long> countRadars() {
+		return new ResponseEntity<>(radarService.countRadars(), HttpStatus.OK);
+	}
+
+	@GetMapping("/patrol/status")
+	public ResponseEntity<Boolean> getPatrolStatus() {
+		return new ResponseEntity<>(radarService.isPatrolActive(), HttpStatus.OK);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.radovan.play.dto;
 
+import com.radovan.play.validation.YearNotInFuture;
 import play.data.validation.Constraints;
 
 import java.io.Serializable;
@@ -29,6 +30,11 @@ public class VehicleDto implements Serializable {
     @Constraints.MinLength(value = 2)
     @Constraints.MaxLength(value = 30)
     private String model;
+
+    @Constraints.Required
+    @Constraints.Min(value = 1960)
+    @YearNotInFuture
+    private Integer manufactureYear;
 
     @Constraints.Required
     @Constraints.Min(value = 1)
@@ -82,21 +88,23 @@ public class VehicleDto implements Serializable {
         this.ownerId = ownerId;
     }
 
+
+    public Integer getManufactureYear() {
+        return manufactureYear;
+    }
+
+    public void setManufactureYear(Integer manufactureYear) {
+        this.manufactureYear = manufactureYear;
+    }
+
     public VehicleDto() {
     }
 
-    public VehicleDto(String registrationNumber, String brand, Double fiscalPower, String model) {
+    public VehicleDto(String registrationNumber, String brand, Double fiscalPower, String model, Integer manufactureYear) {
         this.registrationNumber = registrationNumber;
         this.brand = brand;
         this.fiscalPower = fiscalPower;
         this.model = model;
-    }
-
-    public VehicleDto(String registrationNumber, String brand, Double fiscalPower, String model, Long ownerId) {
-        this.registrationNumber = registrationNumber;
-        this.brand = brand;
-        this.fiscalPower = fiscalPower;
-        this.model = model;
-        this.ownerId = ownerId;
+        this.manufactureYear = manufactureYear;
     }
 }

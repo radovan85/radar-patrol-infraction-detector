@@ -26,6 +26,9 @@ public class VehicleEntity implements Serializable {
     @Column(nullable = false,length = 30)
     private String model;
 
+    @Column(nullable = false,name="manufacture_year")
+    private Integer manufactureYear;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id",nullable = false)
     private OwnerEntity owner;
@@ -78,5 +81,11 @@ public class VehicleEntity implements Serializable {
         this.owner = owner;
     }
 
+    public Integer getManufactureYear() {
+        return manufactureYear;
+    }
 
+    public void setManufactureYear(Integer manufactureYear) {
+        this.manufactureYear = manufactureYear;
+    }
 }

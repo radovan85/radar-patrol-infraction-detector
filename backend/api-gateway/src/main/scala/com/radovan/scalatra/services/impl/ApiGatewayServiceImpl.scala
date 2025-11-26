@@ -38,7 +38,6 @@ class ApiGatewayServiceImpl @Inject() () extends ApiGatewayService {
 
     // Konstrukcija pune URL adrese
     val fullUrl = s"$serviceUrl${request.getRequestURI}"
-    println(s"[ApiGateway] Forwarding to service=$serviceName, fullUrl=$fullUrl")
 
     // Priprema HttpRequest bazirano na metodi
     val httpRequest = method match {

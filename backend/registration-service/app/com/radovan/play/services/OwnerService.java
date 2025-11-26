@@ -12,7 +12,7 @@ public interface OwnerService {
 
     OwnerDto updateOwner(OwnerDto ownerDto,Long ownerId);
 
-    void deleteOwner(Long ownerId);
+    void deleteOwner(Long ownerId,String jwtToken);
 
     List<OwnerDto> listAll();
 

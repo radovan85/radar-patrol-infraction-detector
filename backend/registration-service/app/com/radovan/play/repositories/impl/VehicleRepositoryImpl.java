@@ -128,4 +128,19 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         });
     }
 
+    @Override
+    public List<VehicleEntity> findAllByOwnerId(Long ownerId) {
+        return withSession(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<VehicleEntity> query = cb.createQuery(VehicleEntity.class);
+            Root<VehicleEntity> root = query.from(VehicleEntity.class);
+
+            query.select(root)
+                    .where(cb.equal(root.get("owner").get("id"), ownerId));
+
+            return session.createQuery(query).getResultList();
+        });
+    }
+
+
 }

@@ -7,7 +7,9 @@ import com.radovan.play.exceptions.ExistingInstanceException;
 import com.radovan.play.exceptions.InstanceUndefinedException;
 import com.radovan.play.repositories.OwnerRepository;
 import com.radovan.play.services.OwnerService;
+import com.radovan.play.services.VehicleService;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import java.util.List;
@@ -20,11 +22,15 @@ public class OwnerServiceImpl implements OwnerService {
 
     private OwnerRepository ownerRepository;
     private TempConverter tempConverter;
+    private Provider<VehicleService> vehicleServiceProvider; // 👈 Provider umesto direktnog servisa
 
     @Inject
-    private void initialize(OwnerRepository ownerRepository, TempConverter tempConverter) {
+    private void initialize(OwnerRepository ownerRepository,
+                            TempConverter tempConverter,
+                            Provider<VehicleService> vehicleServiceProvider) {
         this.ownerRepository = ownerRepository;
         this.tempConverter = tempConverter;
+        this.vehicleServiceProvider = vehicleServiceProvider;
     }
 
     @Override
@@ -65,8 +71,14 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
-    public void deleteOwner(Long ownerId) {
+    public void deleteOwner(Long ownerId, String jwtToken) {
         getOwnerById(ownerId);
+        
+        VehicleService vehicleService = vehicleServiceProvider.get();
+
+        vehicleService.listAllByOwnerId(ownerId)
+                .forEach(vehicleDto -> vehicleService.deleteVehicle(vehicleDto.getId(), jwtToken));
+
         ownerRepository.deleteById(ownerId);
     }
 

@@ -12,7 +12,7 @@ public interface VehicleService {
 
     VehicleDto getVehicleById(Long vehicleId);
 
-    void deleteVehicle(Long vehicleId);
+    void deleteVehicle(Long vehicleId,String jwtToken);
 
     Long vehicleCount();
 
@@ -21,4 +21,6 @@ public interface VehicleService {
     List<VehicleDto> listAllByRegistrationNumberContains(String keyword);
 
     VehicleDto getVehicleByRegistrationNumber(String registrationNumber);
+
+    List<VehicleDto> listAllByOwnerId(Long ownerId);
 }

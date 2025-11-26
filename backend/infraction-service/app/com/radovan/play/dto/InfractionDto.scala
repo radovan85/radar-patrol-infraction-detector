@@ -11,7 +11,7 @@ class InfractionDto extends Serializable{
 
   @BeanProperty var vehicleRegistrationNumber:String = _
 
-  @BeanProperty var vehicleSpeed:java.lang.Long = _
+  @BeanProperty var vehicleSpeed:java.lang.Integer = _
 
   @BeanProperty var radarId:java.lang.Long = _
 

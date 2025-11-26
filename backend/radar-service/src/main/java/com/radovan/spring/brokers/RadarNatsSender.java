@@ -75,8 +75,6 @@ public class RadarNatsSender {
 
 			connection.publish("infraction.create", payload.getBytes(StandardCharsets.UTF_8));
 
-			System.out.printf("📤 Infraction sent: %s%n", payload);
-
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to send infraction", e);
 		}

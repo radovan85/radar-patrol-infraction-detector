@@ -32,36 +32,7 @@ public class LoadData {
         generateVehicles();
     }
 
-    /*
-    public void generateOwners() {
-        if (ownerService.count() == 0L) {
-            List<OwnerDto> owners = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(
-                            Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("owners.txt"))))) {
 
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] parts = line.split(",");
-                    if (parts.length == 3) {
-                        String name = parts[0].trim();
-                        String birthDateStr = parts[1].trim();
-                        String email = parts[2].trim();
-                        owners.add(new OwnerDto(name, birthDateStr, email));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            owners.forEach(ownerService::addOwner);
-            System.out.println("Inserted " + owners.size() + " owners from conf/owners.txt");
-        } else {
-            System.out.println("Owners already exist, skipping seeding.");
-        }
-    }
-
-     */
 
 
     public void generateOwners() {
@@ -97,17 +68,26 @@ public class LoadData {
 
                 List<VehicleDto> vehicles = lines
                         .map(line -> line.split(","))
-                        .filter(parts -> parts.length == 4)
+                        .filter(parts -> parts.length == 5) // sada očekujemo 5 polja
                         .map(parts -> {
-                            String registrationNumber = parts[0].trim();
+                            String registrationNumber = parts[0].trim().toUpperCase();
                             String brand = parts[1].trim();
                             Double fiscalPower = Double.valueOf(parts[2].trim());
                             String model = parts[3].trim();
+                            Integer manufactureYear = Integer.valueOf(parts[4].trim());
 
                             // random ownerId iz liste
                             Long ownerId = ownerIds.get(random.nextInt(ownerIds.size()));
 
-                            return new VehicleDto(registrationNumber, brand, fiscalPower, model, ownerId);
+                            VehicleDto dto = new VehicleDto();
+                            dto.setRegistrationNumber(registrationNumber);
+                            dto.setBrand(brand);
+                            dto.setFiscalPower(fiscalPower);
+                            dto.setModel(model);
+                            dto.setManufactureYear(manufactureYear);
+                            dto.setOwnerId(ownerId);
+
+                            return dto;
                         })
                         .toList();
 
@@ -121,5 +101,6 @@ public class LoadData {
             System.out.println("Vehicles already exist, skipping seeding.");
         }
     }
+
 
 }

@@ -1,5 +1,6 @@
 package com.radovan.play.services.impl;
 
+import com.radovan.play.brokers.NatsBrokerSender;
 import com.radovan.play.converter.TempConverter;
 import com.radovan.play.dto.VehicleDto;
 import com.radovan.play.entity.VehicleEntity;
@@ -20,14 +21,16 @@ public class VehicleServiceImpl implements VehicleService {
     private VehicleRepository vehicleRepository;
     private TempConverter tempConverter;
     private OwnerService ownerService;
+    private NatsBrokerSender natsSender;
 
 
 
     @Inject
-    private void initialize(VehicleRepository vehicleRepository, TempConverter tempConverter, OwnerService ownerService) {
+    private void initialize(VehicleRepository vehicleRepository, TempConverter tempConverter, OwnerService ownerService,NatsBrokerSender natsSender) {
         this.vehicleRepository = vehicleRepository;
         this.tempConverter = tempConverter;
         this.ownerService = ownerService;
+        this.natsSender = natsSender;
     }
 
     @Override
@@ -65,8 +68,9 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public void deleteVehicle(Long vehicleId) {
-        getVehicleById(vehicleId);
+    public void deleteVehicle(Long vehicleId,String jwtToken) {
+        VehicleDto vehicleDto = getVehicleById(vehicleId);
+        natsSender.deleteInfractionsByRegistrationNumber(vehicleDto.getRegistrationNumber(),jwtToken);
         vehicleRepository.deleteById(vehicleId);
     }
 
@@ -92,5 +96,11 @@ public class VehicleServiceImpl implements VehicleService {
         VehicleEntity vehicleEntity = vehicleRepository.findByRegistrationNumber(registrationNumber)
                 .orElseThrow(() -> new InstanceUndefinedException("The vehicle has not been found!"));
         return tempConverter.vehicleEntityToDto(vehicleEntity);
+    }
+
+    @Override
+    public List<VehicleDto> listAllByOwnerId(Long ownerId) {
+        return vehicleRepository.findAllByOwnerId(ownerId)
+                .stream().map(tempConverter::vehicleEntityToDto).collect(Collectors.toList());
     }
 }

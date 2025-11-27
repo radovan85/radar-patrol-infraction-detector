@@ -1,0 +1,128 @@
+<div class="grid-container">
+  <!-- Header -->
+  <div class="grid-x align-middle mb-2">
+    <div class="cell">
+      <h4><strong>All Radars</strong></h4>
+    </div>
+  </div>
+
+  <!-- Add New Radar Button -->
+  <div class="grid-x align-middle mb-2">
+    <div class="cell small-12">
+      <button class="button primary" (click)="redirect('/radars/addRadar')">
+        <span class="icon">
+          <svg class="icon icon-xs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+        </span>
+        Add New Radar
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Patrol Controls -->
+  <div class="grid-x align-middle mb-2">
+    <div class="cell small-12 text-right">
+      <div class="button-group">
+        <button class="button success" [disabled]="isPatrolActive" (click)="activatePatrols()">
+          <span class="icon">
+            <svg class="icon icon-xs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </span>
+          Activate All Patrols
+        </button>
+
+        <button class="button warning" (click)="deactivatePatrols()" [disabled]="!isPatrolActive">
+          <span class="icon">
+            <svg class="icon icon-xs" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </span>
+          Deactivate All Patrols
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Radar Table -->
+  <div class="card">
+    <div class="card-divider">
+      <h5>Radar List</h5>
+    </div>
+    <div class="card-section">
+      <div class="grid-x">
+        <div class="cell small-12">
+          <table class="hover stack">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Longitude</th>
+                <th>Latitude</th>
+                <th>Max Speed</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dynamic radars with pagination -->
+              <tr *ngFor="let r of getPaginatedRadars(); let i = index">
+                <td>{{ (getCurrentPage() - 1) * 6 + i + 1 }}</td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.longitude }}</td>
+                <td>{{ r.latitude }}</td>
+                <td><span class="label alert">{{ r.maxSpeed }} km/h</span></td>
+                <td>
+                  <span *ngIf="r.status == 1" class="label success">✅ Ready</span>
+                  <span *ngIf="r.status == 0" class="label alert">❌ Not Ready</span>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div class="actions-group">
+                    <button class="button alert tiny" (click)="deleteRadar(r.id)">Delete</button>
+                    <button class="button secondary tiny" (click)="redirect('radars/updateRadar/' + r.id)">Edit</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="grid-x align-middle margin-top-2">
+        <div class="cell small-12 text-right">
+          <div class="grid-x align-middle align-right">
+            <!-- Page info -->
+            <div class="cell shrink" style="margin-right: 1rem;">
+              <span class="pagination-info digital-font">
+                <strong>Page {{ getCurrentPage() }} / {{ getTotalPages() }}</strong>
+              </span>
+            </div>
+
+
+            <!-- Navigation buttons -->
+            <div class="cell shrink">
+              <div class="button-group">
+                <button class="button secondary" [disabled]="getCurrentPage() === 1" (click)="prevPage()">
+                  <span class="icon-left">&laquo;</span> Previous
+                </button>
+                <button class="button secondary" [disabled]="getCurrentPage() === getTotalPages()" (click)="nextPage()">
+                  Next <span class="icon-right">&raquo;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>

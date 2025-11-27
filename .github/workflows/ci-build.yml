@@ -59,7 +59,12 @@ jobs:
           set -e
           cd backend/api-gateway && sbt clean compile universal:packageBin && cd ../..
 
-      
+      - name: Build Angular frontend
+        run: |
+          cd angular-frontend
+          npm install
+          npx @angular/cli build --configuration production
+          cd ..
 
       - name: Build and Push Docker Images
         run: |
@@ -71,7 +76,7 @@ jobs:
           docker build -t $IMAGE_PREFIX/radar-patrol/radar-service:main ./backend/radar-service
           docker build -t $IMAGE_PREFIX/radar-patrol/registration-service:main ./backend/registration-service
           docker build -t $IMAGE_PREFIX/radar-patrol/infraction-service:main ./backend/infraction-service
-          
+          docker build -t $IMAGE_PREFIX/radar-patrol/angular-template:main ./angular-frontend
 
           docker push $IMAGE_PREFIX/radar-patrol/eureka-server:main
           docker push $IMAGE_PREFIX/radar-patrol/auth-service:main
@@ -79,4 +84,4 @@ jobs:
           docker push $IMAGE_PREFIX/radar-patrol/radar-service:main
           docker push $IMAGE_PREFIX/radar-patrol/registration-service:main
           docker push $IMAGE_PREFIX/radar-patrol/infraction-service:main
-          
+          docker push $IMAGE_PREFIX/radar-patrol/angular-template:main

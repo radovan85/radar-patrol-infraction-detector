@@ -1,0 +1,50 @@
+/* Card spacing */
+.card {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Owner details card text */
+  .card-section p {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+  
+  /* Vehicles table styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table thead {
+    background-color: #f3f3f3;
+  }
+  
+  table th, table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e6e6e6;
+  }
+  
+  table tr:hover {
+    background-color: #fafafa;
+  }
+  
+  /* Callout message for no vehicles */
+  .callout.secondary {
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    text-align: center;
+  }
+  
+  /* Back button styling */
+  button.button.hollow {
+    margin-top: 1rem;
+    border: 1px solid #1779ba;
+    color: #1779ba;
+  }
+  
+  button.button.hollow:hover {
+    background-color: #1779ba;
+    color: #fff;
+  }
+  

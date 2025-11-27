@@ -1,19 +1,18 @@
-FROM maven:3.8.3-openjdk-20 as builder
+FROM tomcat:10.1-jdk21
 
 WORKDIR /app
 
-COPY ./pom.xml ./pom.xml
+COPY target/radar-service.war /app/app.war
 
-RUN mvn dependency:go-offline -B
+# Promena porta iz default 8080 u 8082
+RUN sed -i 's/port="8080"/port="8082"/' /usr/local/tomcat/conf/server.xml
 
-COPY ./src ./src
+# Deploy WAR kao ROOT aplikaciju
+RUN mv /app/app.war /usr/local/tomcat/webapps/ROOT.war
 
-RUN mvn clean package
+# Environment varijable za bazu
+ENV DB_URL=${DB_URL}
+ENV DB_USERNAME=${DB_USERNAME}
+ENV DB_PASSWORD=${DB_PASSWORD}
 
-FROM openjdk:20-jdk-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar ./service.jar
-
-CMD ["java", "-jar", "./service.jar"]
+CMD ["catalina.sh", "run"]

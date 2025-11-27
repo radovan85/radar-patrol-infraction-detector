@@ -1,0 +1,68 @@
+<form id="vehicleForm" class="grid-container">
+    <div class="grid-x grid-padding-x">
+  
+      <!-- Registration Number -->
+      <div class="medium-6 cell">
+        <label>Registration Number
+          <input type="text" id="registrationNumber" name="registrationNumber" placeholder="e.g. BG-123-XY" [value]="getCurrentVehicle().registrationNumber" />
+        </label>
+        <span id="registrationNumberError" class="form-error"></span>
+      </div>
+  
+      <!-- Brand -->
+      <div class="medium-6 cell">
+        <label>Brand
+          <input type="text" id="brand" name="brand" placeholder="e.g. Ford" [value]="getCurrentVehicle().brand" />
+        </label>
+        <span id="brandError" class="form-error"></span>
+      </div>
+  
+      <!-- Fiscal Power -->
+      <div class="medium-6 cell">
+        <label>Fiscal Power
+          <input type="text" id="fiscalPower" name="fiscalPower" placeholder="1 - 30" (keydown)="validateNumber($event)" [value]="getCurrentVehicle().fiscalPower" />
+        </label>
+        <span id="fiscalPowerError" class="form-error"></span>
+      </div>
+  
+      <!-- Model -->
+      <div class="medium-6 cell">
+        <label>Model
+          <input type="text" id="model" name="model" placeholder="e.g. Focus" [value]="getCurrentVehicle().model"  />
+        </label>
+        <span id="modelError" class="form-error"></span>
+      </div>
+  
+      <!-- Manufacture Year -->
+      <div class="medium-6 cell">
+        <label>Manufacture Year
+          <input type="text" id="manufactureYear" name="manufactureYear" placeholder="e.g. 2015" (keydown)="validateNumber($event)" [value]="getCurrentVehicle().manufactureYear" />
+        </label>
+        <span id="manufactureYearError" class="form-error"></span>
+      </div>
+  
+      <!-- Owner Autocomplete -->
+      <div class="medium-12 cell">
+        <label>Owner
+          <input type="text" id="ownerSearch" placeholder="Search owner by name/email..." list="ownerOptions" />
+          <datalist id="ownerOptions">
+            <option *ngFor="let owner of getOwnerList()" [value]="owner.name + ' (' + owner.email + ')'">
+            </option>
+          </datalist>
+          
+          <input type="hidden" id="ownerId" name="ownerId" />
+          
+          <input type="hidden" id="ownerId" name="ownerId" />
+        </label>
+        <span id="ownerIdError" class="form-error"></span>
+      </div>
+  
+      <!-- Submit -->
+      <div class="medium-12 cell text-center">
+        <button type="submit" class="button success">Update Vehicle</button>
+      </div>
+  
+    </div>
+  </form>
+  
+

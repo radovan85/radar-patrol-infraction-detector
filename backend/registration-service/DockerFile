@@ -1,19 +1,19 @@
-FROM maven:3.8.3-openjdk-20 as builder
+FROM openjdk:21-alpine
+
+RUN apk add --no-cache bash unzip
 
 WORKDIR /app
 
-COPY ./pom.xml ./pom.xml
+COPY target/universal/registration-service-0.1.0-SNAPSHOT.zip /app/registration-service.zip
 
-RUN mvn dependency:go-offline -B
+RUN unzip /app/registration-service.zip && rm /app/registration-service.zip
 
-COPY ./src ./src
+ENV DB_URL=${DB_URL}
+ENV DB_USERNAME=${DB_USERNAME}
+ENV DB_PASSWORD=${DB_PASSWORD}
 
-RUN mvn clean package
+RUN mv /app/registration-service-0.1.0-SNAPSHOT /app/registration-service
 
-FROM openjdk:20-jdk-alpine
+RUN chmod +x /app/registration-service/bin/registration-service
 
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar ./service.jar
-
-CMD ["java", "-jar", "./service.jar"]
+CMD ["/bin/bash", "-c", "exec /app/registration-service/bin/registration-service"]

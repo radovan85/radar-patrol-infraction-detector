@@ -1,0 +1,23 @@
+<div class="grid-x" style="min-height: 100vh;">
+
+    <!-- Sidebar -->
+    <aside class="cell small-12 medium-3 large-2" style="background-color:#1f1f1f; padding:1rem 0;">
+      <div class="text-center">
+        <img src="assets/img/logoWhite.png" alt="RadarPlatio" style="height:40px; margin-bottom:1rem;">
+      </div>
+      <ul class="vertical menu">
+        <li><a (click)="redirect('/home')" class="menu-item">Dashboard</a></li>
+        <li><a (click)="redirect(`/owners`)" class="menu-item">Owners</a></li>
+        <li><a (click)="redirect(`/vehicles`)" class="menu-item">Vehicles</a></li>
+        <li><a (click)="redirect('/radars')" class="menu-item">Radars</a></li>
+        <li><a (click)="redirect(`/infractions`)" class="menu-item">Infractions</a></li>
+        <li><a class="menu-item" (click)="logout()">Logout</a></li>
+      </ul>
+    </aside>
+  
+    <!-- Main Content -->
+    <main class="cell small-12 medium-9 large-10" style="padding:1rem 2rem;">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+  

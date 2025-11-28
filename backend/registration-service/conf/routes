@@ -1,0 +1,28 @@
+# Routes
+
+#Owners
+GET   /api/owners      com.radovan.play.controllers.OwnerController.getAllOwners
+GET   /api/owners/count  com.radovan.play.controllers.OwnerController.countOwners
+POST  /api/owners      com.radovan.play.controllers.OwnerController.saveOwner(request:Request)
+GET   /api/owners/:id   com.radovan.play.controllers.OwnerController.getOwnerDetails(id:Long)
+PUT   /api/owners/:id   com.radovan.play.controllers.OwnerController.updateOwner(request:Request,id:Long)
+DELETE  /api/owners/:id   com.radovan.play.controllers.OwnerController.deleteOwner(id:Long,request:Request)
+
+#Vehicles
+GET   /api/vehicles    com.radovan.play.controllers.VehicleController.getAllVehicles
+POST  /api/vehicles    com.radovan.play.controllers.VehicleController.saveVehicle(request:Request)
+GET   /api/vehicles/count    com.radovan.play.controllers.VehicleController.countVehicles
+GET   /api/vehicles/:id   com.radovan.play.controllers.VehicleController.getVehicleDetails(id:Long)
+GET   /api/vehicles/byRn/:rn   com.radovan.play.controllers.VehicleController.getVehicleDetailsByRN(rn:String)
+PUT   /api/vehicles/:id   com.radovan.play.controllers.VehicleController.updateVehicle(request:Request,id:Long)
+DELETE   /api/vehicles/:id   com.radovan.play.controllers.VehicleController.deleteVehicle(id:Long,request:Request)
+GET   /api/vehicles/byOwnerId/:id    com.radovan.play.controllers.VehicleController.getAllByOwnerId(id:Long)
+
+#Health
+GET     /api/health     com.radovan.play.controllers.HealthController.healthCheck
+
+#metrics
+GET  /prometheus   com.radovan.play.controllers.PrometheusController.getMetrics
+
+
+

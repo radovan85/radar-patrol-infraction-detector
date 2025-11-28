@@ -1,0 +1,81 @@
+<div class="grid-container">
+  <div class="grid-x align-middle mb-2">
+    <div class="cell">
+      <h4><strong>New Radar</strong></h4>
+    </div>
+  </div>
+
+  <div class="grid-x grid-margin-x grid-margin-y">
+    <div class="cell small-12 medium-10 large-8">
+      <div class="card">
+        <div class="card-divider">
+          <h5>General Information</h5>
+        </div>
+        <div class="card-section">
+          <form id="radarForm">
+
+            <!-- Radar Name -->
+            <div class="grid-x grid-margin-x">
+              <div class="cell small-12 medium-6">
+                <label for="name">Radar Name
+                  <input id="name" name="name" type="text" placeholder="Radar name">
+                </label>
+                <span class="form-error" id="nameError"></span>
+              </div>
+
+              <!-- Max Speed -->
+              <div class="cell small-12 medium-6">
+                <label for="maxSpeed">Max Speed
+                  <input id="maxSpeed" name="maxSpeed" type="text" (keydown)="validateNumber($event)" placeholder="Max speed">
+                </label>
+                <span class="form-error" id="maxSpeedError"></span>
+              </div>
+            </div>
+
+            <!-- Longitude & Latitude -->
+            <div class="grid-x grid-margin-x">
+              <div class="cell small-12 medium-6">
+                <label for="longitude">Longitude
+                  <input id="longitude" name="longitude" type="text" (keydown)="validateNumber($event)" placeholder="Radar longitude">
+                </label>
+                <span class="form-error" id="longitudeError"></span>
+              </div>
+
+              <div class="cell small-12 medium-6">
+                <label for="latitude">Latitude
+                  <input id="latitude" name="latitude" type="text" (keydown)="validateNumber($event)" placeholder="Radar latitude">
+                </label>
+                <span class="form-error" id="latitudeError"></span>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="grid-x grid-margin-x">
+              <div class="cell small-12 medium-6">
+                <label for="status">Status
+                  <select id="status" name="status">
+                    <option value="" selected disabled>-- Select status --</option>
+                    <option value="1">Available</option>
+                    <option value="0">Unavailable</option>
+                  </select>
+                </label>
+                <span class="form-error" id="statusError">You must select one of the options.</span>
+              </div>
+            </div>
+
+
+            <!-- Submit -->
+            <div class="grid-x">
+              <div class="cell">
+                <button type="submit" class="button success expanded">
+                  Save Radar
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

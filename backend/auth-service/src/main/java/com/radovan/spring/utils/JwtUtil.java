@@ -5,9 +5,6 @@ import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -22,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@Component
-@PropertySource("classpath:application.properties")
+@SuppressWarnings("unchecked")
 public class JwtUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
@@ -31,9 +27,6 @@ public class JwtUtil {
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
 	private long jwtExpiration;
-
-	@Autowired
-	private Environment environment;
 
 	public JwtUtil() {
 		// Privremeno postavljamo vrednosti dok Spring ne injektuje Environment
@@ -44,9 +37,9 @@ public class JwtUtil {
 
 	@Autowired
 	public void init() {
-		String privateKeyString = environment.getProperty("jwt.private-key");
-		String publicKeyString = environment.getProperty("jwt.public-key");
-		String expiration = environment.getProperty("jwt.expiration");
+		String privateKeyString = System.getenv("JWT_PRIVATE_KEY");
+		String publicKeyString = System.getenv("JWT_PUBLIC_KEY");
+		String expiration = System.getenv("JWT_EXPIRATION");
 
 		if (privateKeyString == null || publicKeyString == null || expiration == null) {
 			throw new IllegalStateException("JWT configuration missing in application.properties");

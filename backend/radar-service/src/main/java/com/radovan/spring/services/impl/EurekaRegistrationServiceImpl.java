@@ -37,7 +37,7 @@ public class EurekaRegistrationServiceImpl implements EurekaRegistrationService 
 
 			String appName = "radar-service";
 			String instanceId = appName + "-01";
-			int port = 8082;
+			int port = Integer.valueOf(System.getenv("SPRING_PORT"));
 
 			// Kreiranje podataka za registraciju
 			Map<String, Object> instanceData = new HashMap<>();

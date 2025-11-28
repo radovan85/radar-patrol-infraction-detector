@@ -50,7 +50,7 @@ public class EurekaRegistrationServiceImpl implements EurekaRegistrationService 
 
             String appName = "registration-service";
             String instanceId = appName + "-01";
-            int port = 9002;
+            int port = Integer.valueOf(System.getenv("PLAY_PORT"));
 
             // Kreiranje podataka za registraciju
             Map<String, Object> instanceData = new HashMap<>();

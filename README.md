@@ -129,8 +129,8 @@ Before running Terraform and deploying Nomad jobs, you need to prepare the envir
 2.1 Navigate to the infra folder
 From the project root, switch into the infra directory:
 
-bash
 cd infra
+
 Why this is required:
 
 The infra folder contains all infrastructure‑related configuration: Terraform scripts, Nomad job files, and helper scripts.
@@ -142,13 +142,16 @@ It keeps the workflow clean and reproducible, so mentees or collaborators always
 2.2 Create persistent volume directories
 Next, create host directories that will be mounted as persistent volumes:
 
-bash
+
+
 sudo mkdir -p /opt/nomad-volumes/pgdata
 sudo mkdir -p /opt/nomad-volumes/prometheus
 sudo mkdir -p /opt/nomad-volumes/grafana
 sudo mkdir -p /opt/nomad-volumes/mariadata
 
 sudo chown 472:472 /opt/nomad-volumes/grafana
+
+
 Why this is required:
 
 /opt/nomad-volumes/pgdata → stores PostgreSQL (or other DB) data so the database state persists across container restarts.
@@ -170,11 +173,12 @@ Prometheus needs a configuration file to know which services to scrape for metri
 3.1 Create the configuration file
 Open and edit the file:
 
-bash
 sudo nano /opt/nomad-volumes/prometheus/prometheus.yml
+
+
 Paste the following content:
 
-yaml
+
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
@@ -232,8 +236,9 @@ evaluation_interval determines how often rules are evaluated (handy if you add a
 4. 🧭 Starting the Nomad Agent
 Once the persistent volumes are created and Prometheus is configured, you can start the Nomad agent using the provided configuration file:
 
-bash
 nomad agent -config=./nomad-config/nomad.hcl
+
+
 🔎 Why this step is required
 Nomad orchestration: The agent is the core process that runs Nomad. Without it, jobs cannot be submitted or scheduled.
 
@@ -253,8 +258,9 @@ Once the Nomad agent is running, the next step is to let Terraform provision and
 5.1 Navigate back to the infra folder
 From your project root, switch again into the infra directory:
 
-bash
+
 cd infra
+
 Why this is required:
 
 The infra folder contains all Terraform configuration files (*.tf) that describe how Nomad jobs, volumes, and supporting services should be deployed.
@@ -264,10 +270,11 @@ Running Terraform commands from this folder ensures it can correctly locate and 
 5.2 Run Terraform commands
 Execute the following commands in sequence:
 
-bash
 terraform init
 terraform plan
 terraform apply
+
+
 terraform init → initializes the working directory, downloads providers (Nomad, Docker, etc.), and prepares the backend.
 
 terraform plan → shows a preview of what Terraform will create, update, or destroy. This is your chance to verify the changes before applying them.
